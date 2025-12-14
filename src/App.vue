@@ -12,8 +12,8 @@
           </div>
           
           <div class="nav-links">
-            <a href="#">使用文档</a>
-            <a href="#">联系我们</a>
+            <div class="header-link" @click="toDoc" >使用文档</div>
+            <div class="header-link"  @click="contactUs">联系我们</div>
           </div>
         </nav>
       </div>
@@ -27,7 +27,7 @@
           <p>只需连接手机，自动采集应用弹窗广告，智能生成精准、可读性强的消除规则。是一款致力于为用户提供创造一个纯净、无打扰空间的安卓手机软件工具。</p>
           <!-- <button class="btn-primary" @click="startCollect">立即开始使用</button> -->
         </div>
-        <div class="hero-image">
+        <div>
           <div class="demo-card">
             <div class="demo-header">DeviceGuard Pro v2.3</div>
             <div class="demo-body">
@@ -36,6 +36,11 @@
                 <div class="step-title">请连接手机</div>
                 <div class="step-desc">使用原装数据线连接手机，确保已开启 USB 调试与文件传输权限</div>
                 <button class="btn-primary" @click="startCollect">已连接，下一步</button>
+              </div>
+
+              <div class="step" v-if="step === 0">
+                <div class="step-title">正在获取已安装应用</div>
+                <div class="spinner" style="margin:10px 0 10px;"></div>
               </div>
 
               <div class="step" v-if="step === 2">
@@ -197,6 +202,16 @@
           </div>
         </div>
       </section>
+      <div style="height:5rem;" ref="doc"></div>
+      <div style="width:100%;">
+        <h2 class="section-title">使用文档</h2>
+        <div class="demo-card" style="height:800px;width:100%"></div>
+      </div>
+      <div style="height:5rem;" ref="contact"></div>
+      <div style="width:100%;">
+        <h2 class="section-title">联系我们</h2>
+        <div class="demo-card" style="height:800px;width:100%"></div>
+      </div>
     </div>
 
     <footer>
@@ -231,19 +246,40 @@ const ruleCount = ref(999);
 const appCount = ref(0);
 const mockApps = ref([]);
 const downloading = ref(false)
+const doc = ref(null)
+const contact = ref(null)
 
+const toDoc = () => {
+  if (doc.value) {
+    doc.value.scrollIntoView({
+      behavior: 'smooth',  
+      block: 'start',
+      inline: 'nearest'    
+    })
+  }
+}
+
+const contactUs = () => {
+  if (contact.value) {
+    contact.value.scrollIntoView({
+      behavior: 'smooth',  
+      block: 'start',
+      inline: 'nearest'    
+    })
+  }
+}
 const downloadFile = async () => {
   downloading.value = true
   try{
     const link = document.createElement('a')
-    link.href = 'https://fastly.jsdelivr.net/gh/feymanpaper/GKD_subscription@main/dist/gkd.json5'
+    link.href = 'https://fastly.jsdelivr.net/gh/dgliang/GKD_subscription@main/dist/gkd.json5'
     link.download = 'deviceguard_rules.json5'  
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }catch(err){
     try {
-            const response = await fetch('https://raw.githubusercontent.com/feymanpaper/GKD_subscription/main/dist/gkd.json5')
+            const response = await fetch('https://raw.githubusercontent.com/dgliang/GKD_subscription/main/dist/gkd.json5')
             
             if (!response.ok) throw new Error('下载失败')
             
@@ -272,15 +308,12 @@ const downloadFile = async () => {
 
 
 const startCollect = () => {
-  ifConnected.value = true
-  step.value = 2
   getConnection();
   if(ifConnected.value === false){
     openAlert('请先连接手机')
   }
   else{
     getApps();
-    step.value = 2;
   }
 };
 
@@ -305,6 +338,7 @@ const getConnection = async () => {
 }    
 const getApps = async () => {
   try {
+    step.value = 0;
     // 调用后端接口获取原始数据
     const response = await getAppList()  // response 就是 { total: 34, apps: [...] }
 
@@ -324,6 +358,8 @@ const getApps = async () => {
     step.value = 1  // 回到初始状态
     appCount.value = 0
     mockApps.value = []
+  }finally{
+    step.value = 2;
   }
 }
 
@@ -568,14 +604,50 @@ nav {
   gap:5px;
 }
 .logo span { color: var(--gray-900); }
-.nav-links a {
+.nav-links{
+  gap:30px;
+  display: flex;
+  justify-content: space-between;  /* 水平：左右分布 */
   margin-left: 2rem;
   text-decoration: none;
   color: var(--gray-600);
   font-weight: 500;
 }
-.nav-links a:hover { color: var(--primary); }
+/* 单个导航链接 */
+.header-link {
+  position: relative;               /* 用于定位伪元素下划线 */
+  color: var(--gray-600);
+  font-weight: 500;
+  cursor: pointer;                  /* 鼠标悬浮时显示手型（点击样式） */
+  padding: 8px 0;                   /* 给下划线留出空间 */
+  transition: color 0.3s ease;      /* 文字颜色平滑过渡 */
+}
 
+/* 鼠标悬浮时的文字颜色变化（可选，更明显） */
+.header-link:hover {
+  color: #1d4ed8;            /* 变为主题蓝 */
+}
+
+/* 下划线（使用 ::after 伪元素实现） */
+.header-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;                      /* 下划线粗细 */
+  background: #1d4ed8;       /* 蓝色下划线 */
+  border-radius: 2px;
+  transition: all 0.4s ease;        /* 宽度和左右位移的动画 */
+  transform: translateX(-50%);      /* 初始居中 */
+}
+
+/* 悬浮时下划线展开动画 */
+.header-link:hover::after {
+  width: 100%;                      /* 展开到文字全宽 */
+  left: 50%;
+  transform: translateX(-50%);
+}
 /* Hero + Product Intro */
 .hero {
   padding: 80px 0;
@@ -659,7 +731,6 @@ nav {
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.08);
   overflow: hidden;
-  max-width: 720px;
   margin: 0 auto;
 }
 .demo-header {
