@@ -24,10 +24,11 @@ export const getTasks = () => {
     })
 }
 
-// 获取消融规则文件
-export const getRules = () => {
+// 提交任务
+export const postTask = (params = []) => {
   return request({
-    url: '/api/rulesDoc',
-    method: 'get'
+    url: '/api/run_task',  // 或后端指定的路径，比如 /api/tasks/check
+    method: 'post',
+    data: params          
   })
 }

@@ -238,7 +238,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
-import { getAppList, getConnectionStatus, getTasks } from '@/utils/api.js';
+import { getAppList, getConnectionStatus, postTask } from '@/utils/api.js';
 
 const ifConnected = ref(true);
 const step = ref(1);
@@ -297,7 +297,7 @@ const downloadFile = async () => {
             // 清理内存
             window.URL.revokeObjectURL(url)
         } catch (err) {
-            // openAlert('下载失败，请检查网络连接，推荐使用科学上网加速下载')
+            openAlert('下载失败，请检查网络连接，推荐使用科学上网加速下载')
         } finally {
             downloading.value = false
         }
@@ -412,11 +412,8 @@ const totalTimeText = computed(() => {
   }
 })
 
-// 用于显示小数小时（用于下方说明文字）
-// const totalHours = computed(() => totalMinutes.value / 60)
-
-// 开始采集（进入真正的 spinner 页）
-const startCollecting = () => {
+// 开始采集
+const startCollecting = async() => {
   if (customMinutes.value < 0) {
     openAlert('应用最少采集 10 分钟')
     return
@@ -425,7 +422,25 @@ const startCollecting = () => {
     openAlert('应用最多采集 300 分钟')
     return
   }
-  step.value = 4  // 跳到原来的 spinner 加载页
+  const timestamp = new Date().toISOString(); 
+  const data = mockApps.value
+  .filter(item => item.selected)                    // 筛选 selected 为 true 的项
+  .map(item => ({                                   // 转换成目标格式
+    pkg: item.package,                              // package → pkg
+    app: item.name,                                 // name → app
+    timestamp: timestamp                            // 固定时间戳（或动态生成）
+  }));
+  step.value = 4
+  try{
+    const response = await postTask(data)
+  }catch(err){
+    console.error('应用信息采集失败:', err)
+    openAlert('应用信息采集失败，请检查设备连接或稍后重试')
+    step.value = 2  // 回到选择应用页
+  }finally{
+    step.value = 5;
+  }
+  
 }
 // 判断是否超出推荐范围（10~300 分钟之外变红）
 const isMinutesInvalid = computed(() => {
@@ -449,16 +464,6 @@ watch(() => step.value, (newVal) => {
   }
 })
 
-// 模拟采集完成（原来你有 setTimeout 到 step 5，这里保持一致）
-watch(() => step.value, (newVal) => {
-  if (newVal === 4) {
-    // 根据实际总时间自动跳到完成页（模拟真实耗时）
-    const totalMs = totalCollectMs.value || 10000 // 至少 10 秒演示
-    setTimeout(() => {
-      step.value = 5
-    }, totalMs)
-  }
-})
 // 新增：每秒更新一次的响应式触发器（专门用来强制刷新倒计时）
 const currentTime = ref(Date.now())
 
@@ -494,62 +499,6 @@ const remainingTimeText = computed(() => {
   } else {
     return `剩余时间：${seconds} 秒`
   }
-})
-// 新增：轮询相关状态
-const pollingInterval = ref(null)  // 定时器 ID
-const pollResult = ref(null)       // 轮询返回的数据（可选）
-const isPolling = ref(false)       // 是否正在轮询
-
-// 轮询函数（替换成你的真实接口）
-const pollCollectStatus = async () => {
-  try {
-    const response = await getTasks()    
-    if (response === true) {
-      pollResult.value = response.data
-      stopPolling()                
-      step.value = 5              
-    }
-  } catch (err) {
-    console.error('轮询采集状态失败:', err)
-    // 可选：失败后停止或继续重试
-    // stopPolling()
-  }
-}
-
-// 开始轮询
-const startPolling = () => {
-  if (isPolling.value) return  // 防止重复启动
-  isPolling.value = true
-  pollCollectStatus()  // 立即执行一次
-  pollingInterval.value = setInterval(pollCollectStatus, 3000)  // 每3秒轮询一次
-}
-
-// 停止轮询
-const stopPolling = () => {
-  if (pollingInterval.value) {
-    clearInterval(pollingInterval.value)
-    pollingInterval.value = null
-  }
-  isPolling.value = false
-}
-
-// 关键：监听 remainingTimeText，当显示“即将完成...”时启动轮询
-watch(remainingTimeText, (newVal) => {
-  if (newVal === '即将完成...') {
-    startPolling()
-  }
-})
-
-// 可选：在组件卸载或步骤变化时清理
-watch(() => step.value, (newStep) => {
-  if (newStep !== 4) {  // 离开采集页时停止轮询
-    stopPolling()
-  }
-})
-
-// 组件卸载时也清理（防止内存泄漏）
-onBeforeUnmount(() => {
-  stopPolling()
 })
 </script>
 
