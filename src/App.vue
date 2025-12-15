@@ -173,7 +173,7 @@
               <div class="step" v-if="step === 7">
                 <i class="ri-checkbox-circle-fill success-icon"></i>
                 <div class="step-title" >规则生成成功！</div>
-                <div class="step-desc" style="margin-top: -10px;">已生成 {{ruleCount}} 条精准规则，可直接导入 GKD</div>
+                <div class="step-desc" style="margin-top: -10px;">已生成精准规则，可直接导入 GKD</div>
                 <button class="btn-primary" style="margin-top:-10px;" @click="downloadFile">{{ downloading ? '下载中...' : '下载规则文件' }}</button>
               </div>
             </div>
@@ -314,7 +314,6 @@ import { getAppList, getConnectionStatus, postTask } from '@/utils/api.js';
 
 const ifConnected = ref(true);
 const step = ref(1);
-const ruleCount = ref(999);
 const appCount = ref(0);
 const mockApps = ref([]);
 const downloading = ref(false)
@@ -391,10 +390,7 @@ const startCollect = () => {
 };
 
 const generate = () => {
-  step.value = 6;
-  setTimeout(() => {
-    step.value = 7;
-  }, 5000);
+  step.value = 7;
 };
 const getConnection = async () => {
   try {
