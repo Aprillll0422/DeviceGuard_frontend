@@ -495,8 +495,8 @@ const startCollecting = async() => {
     return
   }
   const timestamp = new Date().toISOString(); 
-  const data = mockApps.value
   const customSec = customMinutes.value * 60
+  const data = mockApps.value
   .filter(item => item.selected)                    // 筛选 selected 为 true 的项
   .map(item => ({                                   // 转换成目标格式
     pkg: item.package,                              // package → pkg
@@ -508,6 +508,7 @@ const startCollecting = async() => {
   try{
     const response = await postTask(data)
     ifSuccess.value = response.success
+    console.log('应用信息采集成功')
   }catch(err){
     console.error('应用信息采集失败:', err)
     openAlert('应用信息采集失败，请检查设备连接或稍后重试')
