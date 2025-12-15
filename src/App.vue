@@ -213,30 +213,13 @@
                 快速开始指南
               </h3>
               <ol style="font-size:1.1rem;color:var(--gray-700);line-height:2;padding-left:2rem;">
-                <li style="margin-bottom:1rem;">
-                  <strong>连接手机</strong>：使用原装数据线连接安卓手机，确保已开启 <strong>USB 调试（开发者选项）</strong> 和 <strong>文件传输（MTP）</strong> 权限。
+                <li style="margin-bottom:0.5rem;">
+                  使用原装数据线连接安卓手机，确保已开启 <strong>USB 调试（开发者选项）</strong> 和 <strong>文件传输（MTP）</strong> 权限。
                 </li>
-                <li style="margin-bottom:1rem;">
-                  点击 <strong>“已连接，下一步”</strong> 按钮，DeviceGuard 会自动获取已安装应用列表。
+                <li style="margin-bottom:0.5rem;">
+                  根据按钮提示进行操作，生成弹窗消除规则后，<strong>下载并导入GKD</strong>，即可永久消除对应弹窗广告。
                 </li>
-                <li style="margin-bottom:1rem;">
-                  在应用列表中勾选需要消除弹窗广告的应用（支持全选）。
-                </li>
-                <li style="margin-bottom:1rem;">
-                  设置每个应用的采集时长（推荐 1 小时，可根据需要调整 10~300 分钟）。
-                </li>
-                <li style="margin-bottom:1rem;">
-                  点击 <strong>“开始采集”</strong>，保持手机连接并正常使用目标应用，让弹窗自然出现。
-                </li>
-                <li style="margin-bottom:1rem;">
-                  采集完成后点击 <strong>“生成弹窗消除规则”</strong>，等待约 5 分钟。
-                </li>
-                <li style="margin-bottom:1rem;">
-                  生成成功后点击 <strong>“下载规则文件”</strong>，得到 <code>deviceguard_rules.json5</code>。
-                </li>
-                <li style="margin-bottom:0;">
-                  将下载的规则文件导入 <strong>GKD（搞快点）</strong> 即可永久消除对应弹窗广告。
-                </li>
+                <li>GKD下载链接：https://gkd.li/</li>
               </ol>
             </div>
 
@@ -247,14 +230,13 @@
               </h3>
               <ul style="font-size:1.1rem;color:var(--gray-700);line-height:2;padding-left:2rem;">
                 <li>采集时间越长，捕获的弹窗种类越多，生成的规则越完整（1~2 小时效果最佳）。</li>
-                <li>采集期间请正常使用选中的应用，多触发各种弹窗（如开屏、升级、活动等）。</li>
-                <li>若手机断开连接，采集会自动暂停，重新连接后可继续。</li>
+                <li>请在采集期间保持手机连接。</li>
                 <li>生成的规则仅针对本次采集的弹窗，精准无误杀。</li>
                 <li>支持批量采集多个应用，一次生成多条规则。</li>
               </ul>
             </div>
 
-            <div style="padding:2rem;background:rgba(37,99,235,0.08);border-radius:12px;border-left:5px solid var(--primary);">
+            <div style="padding:2rem;background:rgba(37,99,235,0.08);border-radius:12px;border-left:5px solid var(--primary);margin-top:-1rem;">
               <p style="font-size:1.1rem;color:var(--gray-800);margin:0;">
                 <i class="ri-information-line" style="font-size:1.4rem;color:var(--primary);vertical-align:middle;margin-right:8px;"></i>
                 <strong>注意：</strong>本工具仅用于学习与个人使用，请尊重应用开发者权益，勿用于商业用途。
@@ -274,15 +256,6 @@
             </p>
 
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:30px;margin-bottom:3rem;">
-              <!-- Telegram -->
-              <div style="background:rgba(37,99,235,0.05);border-radius:16px;padding:30px;border:2px solid rgba(37,99,235,0.15);">
-                <i class="ri-telegram-line" style="font-size:4rem;color:#0088cc;margin-bottom:1rem;"></i>
-                <h4 style="font-size:1.4rem;margin:1rem 0;color:var(--gray-900);">Telegram 频道</h4>
-                <p style="color:var(--gray-600);margin-bottom:1.5rem;">获取最新版本、规则更新和使用教程</p>
-                <a href="https://t.me/deviceguard_pro" target="_blank" class="btn-primary" style="text-decoration:none;display:inline-block;">
-                  加入频道
-                </a>
-              </div>
 
               <!-- GitHub Issues -->
               <div style="background:rgba(37,99,235,0.05);border-radius:16px;padding:30px;border:2px solid rgba(37,99,235,0.15);">
@@ -299,7 +272,7 @@
                 <i class="ri-mail-line" style="font-size:4rem;color:#ea4335;margin-bottom:1rem;"></i>
                 <h4 style="font-size:1.4rem;margin:1rem 0;color:var(--gray-900);">电子邮箱</h4>
                 <p style="color:var(--gray-600);margin-bottom:1.5rem;">商业合作或私人问题可直接邮件联系</p>
-                <a href="mailto:support@deviceguard.pro" class="btn-primary" style="text-decoration:none;display:inline-block;">
+                <a href="mailto:suwj7@mail2.sysu.edu.cn" class="btn-primary" style="text-decoration:none;display:inline-block;">
                   发送邮件
                 </a>
               </div>
@@ -452,14 +425,13 @@ const getApps = async () => {
       selected: false             
     }))
     console.log('应用列表加载完成，共', appCount.value, '个')
+    step.value = 2;
   } catch (err) {
     console.error('获取应用列表失败:', err)
     openAlert('加载应用列表失败，请检查设备连接或稍后重试')
     step.value = 1  // 回到初始状态
     appCount.value = 0
     mockApps.value = []
-  }finally{
-    step.value = 2;
   }
 }
 
@@ -537,7 +509,7 @@ const startCollecting = async() => {
   }catch(err){
     console.error('应用信息采集失败:', err)
     openAlert('应用信息采集失败，请检查设备连接或稍后重试')
-    step.value = 2  // 回到选择应用页
+    step.value = 1  // 回到选择应用页
   }finally{
     if(ifSuccess.value){
       step.value = 5;
