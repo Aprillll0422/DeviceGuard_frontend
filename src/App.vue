@@ -506,7 +506,7 @@ const startCollecting = async() => {
     const response = await postTask(data)
     ifSuccess.value = response.success
     if(ifSuccess.value){
-      step.value = 5;
+      step.value = 7;
     }
     else{
       openAlert('应用信息采集失败，请检查设备连接或稍后重试')
