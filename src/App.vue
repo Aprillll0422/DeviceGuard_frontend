@@ -500,7 +500,8 @@ const startCollecting = async() => {
   .map(item => ({                                   // 转换成目标格式
     pkg: item.package,                              // package → pkg
     app: item.name,                                 // name → app
-    timestamp: timestamp                            // 固定时间戳（或动态生成）
+    timestamp: timestamp,                            // 固定时间戳（或动态生成）
+    runtime:customMinutes.value.toString()
   }));
   step.value = 4
   try{
