@@ -496,7 +496,7 @@ const startCollecting = async() => {
   }
   const timestamp = new Date().toISOString(); 
   const customSec = customMinutes.value * 60
-  const secStr = customSec.value.toString()
+  const secStr = customSec.toString()
   const data = mockApps.value
   .filter(item => item.selected)                    // 筛选 selected 为 true 的项
   .map(item => ({                                   // 转换成目标格式
@@ -509,12 +509,6 @@ const startCollecting = async() => {
   try{
     const response = await postTask(data)
     ifSuccess.value = response.success
-    console.log('应用信息采集成功')
-  }catch(err){
-    console.error('应用信息采集失败:', err)
-    openAlert('应用信息采集失败，请检查设备连接或稍后重试')
-    step.value = 1  // 回到选择应用页
-  }finally{
     if(ifSuccess.value){
       step.value = 5;
     }
@@ -522,9 +516,11 @@ const startCollecting = async() => {
       openAlert('应用信息采集失败，请检查设备连接或稍后重试')
       step.value = 2  // 回到选择应用页
     }
-    
+  }catch(err){
+    console.error('应用信息采集失败:', err)
+    openAlert('应用信息采集失败，请检查设备连接或稍后重试')
+    step.value = 1  // 回到选择应用页
   }
-  
 }
 // 判断是否超出推荐范围（10~300 分钟之外变红）
 const isMinutesInvalid = computed(() => {
