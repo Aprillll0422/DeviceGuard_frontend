@@ -496,12 +496,13 @@ const startCollecting = async() => {
   }
   const timestamp = new Date().toISOString(); 
   const data = mockApps.value
+  const customSec = customMinutes.value * 60
   .filter(item => item.selected)                    // 筛选 selected 为 true 的项
   .map(item => ({                                   // 转换成目标格式
     pkg: item.package,                              // package → pkg
     app: item.name,                                 // name → app
     timestamp: timestamp,                            // 固定时间戳（或动态生成）
-    runtime:customMinutes.value.toString()
+    runtime:customSec.value.toString()
   }));
   step.value = 4
   try{
